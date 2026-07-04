@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Platform Operations Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+<link rel="stylesheet" href="/static/css/dashboard.css?v=22">
+</head>
+<body>
+
+<!-- DevOps ambient decoration (side icons) -->
+<div class="devops-deco" aria-hidden="true">
+  <!-- Left gutter icons -->
+  <svg class="deco-icon deco-l" style="top:8%" viewBox="0 0 24 24"><path d="M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg>
+  <svg class="deco-icon deco-l" style="top:22%" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.61 3.61 0 0 1 8.4 12 3.61 3.61 0 0 1 12 8.4a3.61 3.61 0 0 1 3.6 3.6 3.61 3.61 0 0 1-3.6 3.6z"/></svg>
+  <svg class="deco-icon deco-l" style="top:38%" viewBox="0 0 24 24"><path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/></svg>
+  <svg class="deco-icon deco-l" style="top:54%" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM5 15h5v3H5zm6-5h7v1h-7zm0 2h7v1h-7zm0 2h4v1h-4zM5 7h5v5H5z"/></svg>
+  <svg class="deco-icon deco-l" style="top:70%" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z"/></svg>
+  <svg class="deco-icon deco-l" style="top:86%" viewBox="0 0 24 24"><path d="M6 15c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm9-13c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm5-11c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+  <!-- Right gutter icons -->
+  <svg class="deco-icon deco-r" style="top:12%" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h.71C7.37 7.69 9.48 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3s-1.34 3-3 3z"/></svg>
+  <svg class="deco-icon deco-r" style="top:28%" viewBox="0 0 24 24"><path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+  <svg class="deco-icon deco-r" style="top:44%" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/></svg>
+  <svg class="deco-icon deco-r" style="top:60%" viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+  <svg class="deco-icon deco-r" style="top:76%" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+  <svg class="deco-icon deco-r" style="top:90%" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+</div>
+
+<div class="app" id="app">
+
+  <!-- Sidebar navigation -->
+  <aside class="side">
+    <div class="side-brand">
+      <div class="brand-mark" aria-hidden="true">PO</div>
+      <div>
+        <div class="brand-name">Platform Ops</div>
+        <div class="brand-tag">Control Plane</div>
+      </div>
+    </div>
+
+    <nav class="side-nav">
+      <div class="nav-group">Monitor</div>
+    <div class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">
+      <svg class="tab-icon" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      <span class="tab-label">Overview</span>
+      <span class="tab-hint">At a glance</span>
+    </div>
+    <div class="tab-btn" data-tab="mcp" onclick="switchTab('mcp')">
+      <svg class="tab-icon" viewBox="0 0 24 24"><path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/></svg>
+      <span class="tab-label">Fleet Health</span>
+      <span class="tab-hint">Pods &amp; resources</span>
+    </div>
+    <div class="tab-btn" data-tab="mcpusage" onclick="switchTab('mcpusage')">
+      <svg class="tab-icon" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+      <span class="tab-label">Tool Adoption</span>
+      <span class="tab-hint">Usage insights</span>
+    </div>
+      <div class="nav-group">Insights</div>
+    <div class="tab-btn" data-tab="grafana" onclick="switchTab('grafana')">
+      <svg class="tab-icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      <span class="tab-label">Grafana</span>
+      <span class="tab-hint">Login activity</span>
+    </div>
+    <div class="tab-btn" data-tab="chatops" onclick="switchTab('chatops')">
+      <svg class="tab-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"/></svg>
+      <span class="tab-label">ChatOps</span>
+      <span class="tab-hint">Assistant usage</span>
+    </div>
+      <div class="nav-group">Support</div>
+    <div class="tab-btn" data-tab="jira" onclick="switchTab('jira')">
+      <svg class="tab-icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+      <span class="tab-label">Support &middot; Tools</span>
+      <span class="tab-hint">DEVOPS tickets</span>
+    </div>
+    <div class="tab-btn" data-tab="jira-eaas" onclick="switchTab('jira-eaas')">
+      <svg class="tab-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      <span class="tab-label">Support &middot; EaaS</span>
+      <span class="tab-hint">EAAS &amp; CLOUD</span>
+    </div>
+    </nav>
+
+    <div class="side-foot">
+      <span id="demoBadge" style="display:none;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.6px;background:var(--accent-primary-soft);color:var(--accent-primary);border:1px solid var(--accent-primary)">● DEMO DATA</span>
+      <div class="side-ver">v1.1 &middot; demo build</div>
+    </div>
+  </aside>
+
+  <!-- Main column -->
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-left">
+        <button class="side-toggle" onclick="toggleSidebar()" aria-label="Toggle navigation">&#9776;</button>
+        <div>
+          <div class="tb-title" id="tbTitle">Overview</div>
+          <div class="tb-sub" id="tbSub">Platform status at a glance</div>
+        </div>
+      </div>
+      <div class="tb-right">
+        <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+          <span id="themeIcon">🌙</span>
+          <div class="tt-label" id="themeLabel">Dark</div>
+        </div>
+        <div class="refresh-badge" id="refreshBadge" onclick="refreshAll()">
+          <span style="font-size:18px">&#x21bb;</span>
+          <div>
+            <div class="rb-label">Last Refreshed</div>
+            <div class="rb-time" id="refreshTime">—</div>
+          </div>
+        </div>
+        <div id="autoRefreshToggle" onclick="toggleAutoRefresh()" style="display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:11px;border:1px solid var(--border-color);background:var(--bg-card-flat);user-select:none" title="Toggle auto-refresh">
+          <span id="autoRefreshDot" style="width:8px;height:8px;border-radius:50%;background:var(--status-green);flex-shrink:0"></span>
+          <span id="autoRefreshLabel" style="font-weight:600;color:var(--text-primary)">Auto</span>
+          <span id="autoRefreshCountdown" style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;min-width:28px"></span>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+
+  <!-- ═══════════ GLOBAL FILTER BAR ═══════════ -->
+  <div class="global-filter-bar" id="globalFilterBar">
+    <div class="filter-left">
+      <div class="period-selector">
+        <button class="period-btn" data-period="7" onclick="setGlobalPeriod(7)">7D</button>
+        <button class="period-btn active" data-period="30" onclick="setGlobalPeriod(30)">30D</button>
+        <button class="period-btn" data-period="90" onclick="setGlobalPeriod(90)">3M</button>
+        <button class="period-btn" data-period="180" onclick="setGlobalPeriod(180)">6M</button>
+        <button class="period-btn" data-period="365" onclick="setGlobalPeriod(365)">12M</button>
+      </div>
+      <div class="date-range-group">
+        <input type="date" id="globalDateFrom" class="date-input" title="From date">
+        <span class="date-range-sep">to</span>
+        <input type="date" id="globalDateTo" class="date-input" title="To date">
+        <button class="date-range-apply" onclick="applyGlobalDateRange()">Apply</button>
+      </div>
+    </div>
+    <div class="filter-right">
+      <button class="export-btn" onclick="exportCurrentTab()">
+        <span>⬇</span> Export CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════ OVERVIEW TAB ═══════════ -->
+  <div class="tab-pane active" id="pane-overview">
+    <div class="section-header">
+      <h3 class="section-title">Platform at a Glance</h3>
+      <span class="section-subtitle">Live status across the fleet, tickets, and users for the selected period</span>
+    </div>
+
+    <div class="stat-cards overview-hl-cards" id="overviewCards">
+      <div class="stat-card"><div class="sc-icon"><div class="loading-spinner"></div></div><div class="sc-label">Loading...</div></div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="section-header">
+      <h3 class="section-title">What Stands Out Right Now</h3>
+      <span class="section-subtitle">Signals worth a second look across every connected system</span>
+    </div>
+    <div class="overview-highlights" id="overviewHighlights">
+      <div class="empty-state"><div class="loading-spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MCP TAB ═══════════ -->
+  <div class="tab-pane" id="pane-mcp">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+      <div>
+        <h3 class="section-title">Fleet Health</h3>
+        <span class="section-subtitle">Live pod status across every MCP tool deployment</span>
+      </div>
+    </div>
+
+    <div class="stat-cards" id="mcpCards"></div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-primary-soft);color:var(--accent-primary)">USAGE</span>
+          <span id="mcpToolChartTitle">Tool Calls by MCP</span>
+        </div>
+        <div class="chart-canvas"><canvas id="chartMcpTools"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-primary-soft);color:var(--accent-primary)">HEALTH</span>
+          Pod Health Distribution
+        </div>
+        <div class="chart-canvas"><canvas id="chartMcpStatus"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-primary-soft);color:var(--accent-primary)">RESOURCES</span>
+          Memory Usage by Tool (%)
+        </div>
+        <div class="chart-canvas"><canvas id="chartMcpMemory"></canvas></div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="section-header">
+      <h3 class="section-title">Per-Pod Detail</h3>
+      <span class="section-subtitle">Health, restart rate, and age for each running pod</span>
+    </div>
+    <div class="server-grid" id="mcpServers">
+      <div class="empty-state"><div class="loading-spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MCP USAGE TAB ═══════════ -->
+  <div class="tab-pane" id="pane-mcpusage">
+
+    <!-- ─── MCP Period Filter (OCP logs: max 3 days) ─── -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+      <div>
+        <h3 class="section-title">Tool Adoption</h3>
+        <span class="section-subtitle">Who's using which MCP tools &mdash; parsed live from pod logs</span>
+      </div>
+      <div class="period-selector">
+        <button class="period-btn mcp-period-btn active" data-mcp-period="1" onclick="setMcpPeriod(1)">1D</button>
+        <button class="period-btn mcp-period-btn" data-mcp-period="2" onclick="setMcpPeriod(2)">2D</button>
+        <button class="period-btn mcp-period-btn" data-mcp-period="3" onclick="setMcpPeriod(3)">3D</button>
+      </div>
+    </div>
+
+    <div class="stat-cards" id="mcpOverallCards"></div>
+
+    <!-- Full-width 24h Activity Chart -->
+    <div class="chart-box" style="margin-bottom:18px">
+      <div class="chart-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span>
+          <span class="badge" style="background:var(--accent-primary-soft);color:var(--accent-primary)">24h Activity</span>
+          Users &amp; Tool Calls by MCP
+        </span>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <div id="mcpChartToggles" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+          <button id="resetZoomBtn" onclick="resetMcpDailyZoom()" style="display:none;background:var(--accent-primary);color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Reset Zoom</button>
+        </div>
+      </div>
+      <div style="height:360px;position:relative"><canvas id="chartMcpDaily"></canvas></div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-primary-soft);color:var(--accent-primary)">Distribution</span>
+          Requests by Tool
+        </div>
+        <div class="chart-canvas"><canvas id="chartMcpApps"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ─── SECTION 2: Tool Deep Dive (filtered by tool) ─── -->
+    <div class="section-divider"></div>
+
+    <div class="section-header">
+      <div>
+        <h3 class="section-title"><span id="toolDiveTitle">Tool Deep Dive</span> <span id="toolDiveBadge"></span></h3>
+        <span class="section-subtitle" id="toolDiveSubtitle">Select a specific tool to view its users, functions and activity</span>
+      </div>
+      <select id="mcpToolFilter" onchange="filterMcpByTool()" style="background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);font-family:inherit;font-size:13px;padding:8px 14px;border-radius:8px;outline:none;min-width:240px;font-weight:500">
+        <option value="">All Tools (combined)</option>
+      </select>
+    </div>
+
+    <div class="stat-cards" id="mcpToolCards"></div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-teal-soft);color:var(--accent-teal)">Functions</span>
+          Top Functions Called
+        </div>
+        <div class="chart-canvas"><canvas id="chartMcpFunctions"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-teal-soft);color:var(--accent-teal)">Users</span>
+          Top Users by Requests
+        </div>
+        <div class="chart-canvas"><canvas id="chartMcpUsers"></canvas></div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:0 0 12px">
+      <div>
+        <h3 class="section-title"><span id="userActivityTitle">User Activity</span> <span id="userActivityBadge"></span></h3>
+        <span class="section-subtitle" id="userActivitySubtitle">Users ranked by requests with top functions used</span>
+      </div>
+      <input id="mcpUserSearch" oninput="filterMcpUsers()" placeholder="Search users..." style="background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);font-family:inherit;font-size:12px;padding:6px 12px;border-radius:6px;outline:none;width:240px">
+    </div>
+    <div class="tbl-wrap">
+      <table class="dt">
+        <thead><tr>
+          <th style="width:50px">#</th>
+          <th>Username</th>
+          <th style="width:110px;text-align:right">Tool Calls</th>
+          <th style="width:140px">Tools Used</th>
+          <th>Top Functions</th>
+        </tr></thead>
+        <tbody id="mcpUserBody">
+          <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted)"><div class="loading-spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="mcpUserPagination" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px"></div>
+
+    <!-- Service / Integration Accounts (collapsed by default) -->
+    <div id="mcpSvcSection" style="display:none;margin-top:16px">
+      <div id="mcpSvcBanner" onclick="toggleSvcAccounts()" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;user-select:none">
+        <span id="mcpSvcToggle" style="font-size:12px;transition:transform .2s">&#9654;</span>
+        <span style="font-size:13px;font-weight:700;color:var(--text-secondary)">Service &amp; Integration Accounts</span>
+        <span id="mcpSvcSummary" style="font-size:12px;color:var(--text-muted)"></span>
+      </div>
+      <div id="mcpSvcBody" style="display:none;margin-top:8px">
+        <div class="tbl-wrap">
+          <table class="dt">
+            <thead><tr>
+              <th style="width:50px">Type</th>
+              <th>Account</th>
+              <th style="width:110px;text-align:right">Tool Calls</th>
+              <th style="width:140px">Tools Used</th>
+              <th>Top Functions</th>
+            </tr></thead>
+            <tbody id="mcpSvcTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ JIRA TAB ═══════════ -->
+  <div class="tab-pane" id="pane-jira">
+    <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <h3 class="section-title" style="margin:0">Support &mdash; Platform Tools</h3>
+        <span class="section-subtitle">DEVOPS tickets raised against platform tooling</span>
+      </div>
+      <div class="period-selector">
+        <button class="period-btn jira-flow-btn active" data-flow="" onclick="setJiraFlow('')">All</button>
+        <button class="period-btn jira-flow-btn" data-flow="planned" onclick="setJiraFlow('planned')">Planned</button>
+        <button class="period-btn jira-flow-btn" data-flow="ogs" onclick="setJiraFlow('ogs')">OGS</button>
+      </div>
+    </div>
+
+    <div class="stat-cards" id="jiraCards"></div>
+
+    <!-- Resolved vs Total Line Chart — full width -->
+    <div class="chart-box" style="margin-bottom:18px">
+      <div class="chart-title">
+        <span class="badge" style="background:var(--status-green-soft,rgba(34,197,94,.15));color:var(--status-green)">Resolution</span>
+        Resolved vs Total Requests
+      </div>
+      <div style="height:280px;position:relative"><canvas id="chartJiraResolution"></canvas></div>
+    </div>
+
+    <!-- Type Trend Line Chart — full width -->
+    <div class="chart-box" style="margin-bottom:18px">
+      <div class="chart-title">
+        <span class="badge" style="background:var(--accent-teal-soft);color:var(--accent-teal)">Type Trend</span>
+        Ticket Types Over Time
+      </div>
+      <div style="height:280px;position:relative"><canvas id="chartJiraTypeTrend"></canvas></div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-teal-soft);color:var(--accent-teal)">Volume</span>
+          Jira Cases per Month
+        </div>
+        <div class="chart-canvas"><canvas id="chartJiraTrend"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-teal-soft);color:var(--accent-teal)">Distribution</span>
+          Jira Cases per Tool
+        </div>
+        <div class="chart-canvas"><canvas id="chartJiraTool"></canvas></div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="section-header">
+      <h3 class="section-title">Tool Breakdown</h3>
+      <span class="section-subtitle">Issues categorized by tool/component</span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="dt">
+        <thead><tr>
+          <th>Tool / Component</th>
+          <th>Issue Count</th>
+          <th>Share</th>
+        </tr></thead>
+        <tbody id="jiraToolBody">
+          <tr><td colspan="3" style="text-align:center;padding:24px;color:var(--text-muted)"><div class="loading-spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:0 0 12px">
+      <div>
+        <h3 class="section-title">Recent Tickets</h3>
+        <span class="section-subtitle">Individual ticket details with links</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="jiraTicketSearch" oninput="filterJiraTickets()" placeholder="Search tickets..." style="background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);font-family:inherit;font-size:12px;padding:6px 12px;border-radius:6px;outline:none;width:220px">
+        <button onclick="exportJiraCSV()" style="background:var(--accent-primary);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit">⬇ CSV</button>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="dt">
+        <thead><tr>
+          <th>Key</th>
+          <th>Summary</th>
+          <th>Type</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Assignee</th>
+          <th>Tool</th>
+          <th>Created</th>
+        </tr></thead>
+        <tbody id="jiraTicketBody">
+          <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)"><div class="loading-spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="jiraTicketPagination" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px"></div>
+  </div>
+
+  <!-- ═══════════ JIRA EAAS TAB ═══════════ -->
+  <div class="tab-pane" id="pane-jira-eaas">
+    <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <h3 class="section-title" style="margin:0">Support &mdash; Environment-as-a-Service</h3>
+        <span class="section-subtitle" id="eaasJiraSubtitle">EAAS &amp; CLOUD project tickets for the selected period</span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div class="period-selector">
+          <button class="period-btn eaas-flow-btn active" data-flow="" onclick="setEaasFlow('')">All</button>
+          <button class="period-btn eaas-flow-btn" data-flow="planned" onclick="setEaasFlow('planned')">Planned</button>
+          <button class="period-btn eaas-flow-btn" data-flow="ogs" onclick="setEaasFlow('ogs')">OGS</button>
+        </div>
+        <div id="eaasProjectFilter" class="period-btns" style="gap:4px"></div>
+      </div>
+    </div>
+
+    <div class="stat-cards" id="eaasJiraCards"></div>
+
+    <!-- Resolved vs Total Line Chart — full width -->
+    <div class="chart-box" style="margin-bottom:18px">
+      <div class="chart-title">
+        <span class="badge" style="background:var(--status-green-soft,rgba(34,197,94,.15));color:var(--status-green)">Resolution</span>
+        Resolved vs Total Requests
+      </div>
+      <div style="height:280px;position:relative"><canvas id="chartEaasResolution"></canvas></div>
+    </div>
+
+    <!-- Type Trend Line Chart — full width -->
+    <div class="chart-box" style="margin-bottom:18px">
+      <div class="chart-title">
+        <span class="badge" style="background:var(--accent-teal-soft);color:var(--accent-teal)">Type Trend</span>
+        Ticket Types Over Time
+      </div>
+      <div style="height:280px;position:relative"><canvas id="chartEaasTypeTrend"></canvas></div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-teal-soft);color:var(--accent-teal)">Volume</span>
+          EAAS Cases per Month
+        </div>
+        <div class="chart-canvas"><canvas id="chartEaasTrend"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-teal-soft);color:var(--accent-teal)">Distribution</span>
+          EAAS Cases per Component
+        </div>
+        <div class="chart-canvas"><canvas id="chartEaasTool"></canvas></div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="section-header">
+      <h3 class="section-title">Component Breakdown</h3>
+      <span class="section-subtitle">Issues categorized by tool/component</span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="dt">
+        <thead><tr>
+          <th>Tool / Component</th>
+          <th>Issue Count</th>
+          <th>Share</th>
+        </tr></thead>
+        <tbody id="eaasToolBody">
+          <tr><td colspan="3" style="text-align:center;padding:24px;color:var(--text-muted)"><div class="loading-spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:0 0 12px">
+      <div>
+        <h3 class="section-title">Recent Tickets</h3>
+        <span class="section-subtitle">Individual ticket details with links</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="eaasTicketSearch" oninput="filterEaasTickets()" placeholder="Search tickets..." style="background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);font-family:inherit;font-size:12px;padding:6px 12px;border-radius:6px;outline:none;width:220px">
+        <button onclick="exportEaasCSV()" style="background:var(--accent-primary);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit">⬇ CSV</button>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="dt">
+        <thead><tr>
+          <th>Key</th>
+          <th>Summary</th>
+          <th>Type</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Assignee</th>
+          <th>Tool</th>
+          <th>Created</th>
+        </tr></thead>
+        <tbody id="eaasTicketBody">
+          <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)"><div class="loading-spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="eaasTicketPagination" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px"></div>
+  </div>
+
+  <!-- ═══════════ ChatOps TAB ═══════════ -->
+  <div class="tab-pane" id="pane-chatops">
+    <div class="section-header">
+      <h3 class="section-title">ChatOps Assistant</h3>
+      <span class="section-subtitle">Adoption and activity for the platform chat assistant</span>
+    </div>
+
+    <div class="stat-cards" id="chatopsCards">
+      <div class="stat-card"><div class="sc-icon"><div class="loading-spinner"></div></div><div class="sc-label">Loading...</div></div>
+    </div>
+
+    <div id="chatopsServiceHealth" style="margin:16px 0"></div>
+
+    <div class="global-filter-bar" id="chatopsFilterBar" style="margin:18px 0 8px">
+      <div class="filter-left">
+        <div class="period-selector">
+          <button class="period-btn chatops-period-btn" data-chatops-period="7" onclick="setChatopsPeriod(7)">7D</button>
+          <button class="period-btn chatops-period-btn active" data-chatops-period="30" onclick="setChatopsPeriod(30)">30D</button>
+          <button class="period-btn chatops-period-btn" data-chatops-period="90" onclick="setChatopsPeriod(90)">3M</button>
+          <button class="period-btn chatops-period-btn" data-chatops-period="180" onclick="setChatopsPeriod(180)">6M</button>
+          <button class="period-btn chatops-period-btn" data-chatops-period="365" onclick="setChatopsPeriod(365)">12M</button>
+        </div>
+        <div class="date-range-group">
+          <input type="date" id="chatopsDateFrom" class="date-input" title="From date">
+          <span class="date-range-sep">to</span>
+          <input type="date" id="chatopsDateTo" class="date-input" title="To date">
+          <button class="date-range-apply" onclick="applyChatopsDateRange()">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-box" style="margin-bottom:18px">
+      <div class="chart-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span>
+          <span class="badge" style="background:var(--accent-primary-soft);color:var(--accent-primary)">ACTIVITY</span>
+          Users &amp; Requests Over Time
+        </span>
+      </div>
+      <div style="height:340px;position:relative"><canvas id="chartChatopsActivity"></canvas></div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-teal-soft);color:var(--accent-teal)">Channels</span>
+          Channel Distribution
+        </div>
+        <div class="chart-canvas"><canvas id="chartChatopsChannels"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-teal-soft);color:var(--accent-teal)">MCP Tools</span>
+          MCP Tool Distribution
+        </div>
+        <div class="chart-canvas"><canvas id="chartChatopsMcp"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ GRAFANA TAB ═══════════ -->
+  <div class="tab-pane" id="pane-grafana">
+    <div class="section-header">
+      <h3 class="section-title">Grafana Adoption</h3>
+      <span class="section-subtitle">Non-admin login activity and engagement</span>
+    </div>
+
+    <div class="stat-cards" id="grafanaCards"></div>
+
+    <div class="global-filter-bar" id="grafanaFilterBar" style="margin:18px 0 8px">
+      <div class="filter-left">
+        <div class="period-selector">
+          <button class="period-btn grafana-period-btn" data-gf-period="7" onclick="setGrafanaPeriod(7)">7D</button>
+          <button class="period-btn grafana-period-btn" data-gf-period="30" onclick="setGrafanaPeriod(30)">30D</button>
+          <button class="period-btn grafana-period-btn" data-gf-period="90" onclick="setGrafanaPeriod(90)">3M</button>
+          <button class="period-btn grafana-period-btn" data-gf-period="180" onclick="setGrafanaPeriod(180)">6M</button>
+          <button class="period-btn grafana-period-btn active" data-gf-period="365" onclick="setGrafanaPeriod(365)">12M</button>
+        </div>
+        <div class="date-range-group">
+          <input type="date" id="grafanaDateFrom" class="date-input" title="From date">
+          <span class="date-range-sep">to</span>
+          <input type="date" id="grafanaDateTo" class="date-input" title="To date">
+          <button class="date-range-apply" onclick="applyGrafanaDateRange()">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-secondary-soft);color:var(--accent-secondary)">Activity</span>
+          User Login Activity Distribution
+        </div>
+        <div class="chart-canvas"><canvas id="chartGrafanaActivity"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-secondary-soft);color:var(--accent-secondary)">Timeline</span>
+          Last Seen (days ago)
+        </div>
+        <div class="chart-canvas"><canvas id="chartGrafanaTimeline"></canvas></div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-secondary-soft);color:var(--accent-secondary)">Adoption</span>
+          Engagement Breakdown
+        </div>
+        <div id="grafanaEngagement" style="padding:8px 0"></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">
+          <span class="badge" style="background:var(--accent-secondary-soft);color:var(--accent-secondary)">Auth</span>
+          Authentication Methods
+        </div>
+        <div class="chart-canvas"><canvas id="chartGrafanaAuth"></canvas></div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="section-header">
+      <h3 class="section-title">Recently Active Users</h3>
+      <span class="section-subtitle">Users who logged in within the last 7 days</span>
+    </div>
+    <div id="grafanaRecentUsers" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+      <div class="stat-card" style="width:120px"><div class="sc-icon"><div class="loading-spinner"></div></div></div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:0 0 12px">
+      <div>
+        <h3 class="section-title">All User Logins</h3>
+        <span class="section-subtitle">Non-admin user login details and last seen timestamps</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="grafanaUserFilter" onchange="filterGrafanaUsers()" style="background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);font-family:inherit;font-size:12px;padding:6px 12px;border-radius:6px;outline:none">
+          <option value="">All Users</option>
+          <option value="active_7d">Active (7 days)</option>
+          <option value="active_30d">Active (30 days)</option>
+          <option value="inactive">Inactive (30d+)</option>
+          <option value="never">Never Logged In</option>
+        </select>
+        <input id="grafanaUserSearch" oninput="filterGrafanaUsers()" placeholder="Search by name or login..." style="background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);font-family:inherit;font-size:12px;padding:6px 12px;border-radius:6px;outline:none;width:220px">
+        <button onclick="exportGrafanaUsersCSV()" style="background:var(--accent-primary);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit">⬇ CSV</button>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="dt">
+        <thead><tr>
+          <th style="width:30px">Status</th>
+          <th>Login</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Last Seen</th>
+          <th>Days Ago</th>
+          <th>Auth</th>
+        </tr></thead>
+        <tbody id="grafanaUserBody">
+          <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)"><div class="loading-spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="grafanaUserPagination" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px"></div>
+
+    <div id="grafanaPanels" style="margin-top:24px"></div>
+  </div>
+
+  <div class="footer">
+    <span style="opacity:.7">Platform Ops Console</span> &mdash; v1.1 &bull; demo build
+    <div style="margin-top:6px;font-size:10px;letter-spacing:.5px;text-transform:uppercase;opacity:.4">Continuous monitoring &bull; Rate-aware health &bull; Adoption insights</div>
+  </div>
+
+    </main>
+  </div>
+</div>
+
+<div class="nav-backdrop" id="navBackdrop" onclick="toggleSidebar()"></div>
+<div class="toast" id="toast"></div>
+<script src="/static/js/dashboard.js?v=78"></script>
+</body>
+</html>

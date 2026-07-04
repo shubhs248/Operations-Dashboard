@@ -1,0 +1,23 @@
+# Platform Operations Dashboard - Python 3.11+
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+jinja2>=3.1.0
+
+# HTTP client (httpx for async, requests for sync collectors)
+httpx>=0.27.0
+requests>=2.31.0
+
+# Database & Cache
+psycopg2-binary>=2.9.9
+redis>=5.0.0
+
+# Scheduler
+apscheduler>=3.10.4
+
+# Environment config
+python-dotenv>=1.0.0
+
+# Date handling
+python-dateutil>=2.9.0

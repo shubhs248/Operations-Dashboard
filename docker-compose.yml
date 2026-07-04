@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  dashboard:
+    build: .
+    container_name: platform-ops-dashboard
+    ports:
+      - "9200:9200"
+    volumes:
+      - dashboard-data:/app/data
+    env_file:
+      - .env
+    environment:
+      - APP_PORT=9200
+      - APP_HOST=0.0.0.0
+      - WEB_WORKERS=1
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 2048M
+        reservations:
+          cpus: "1.0"
+          memory: 512M
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/api/mcp/metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  dashboard-data:
