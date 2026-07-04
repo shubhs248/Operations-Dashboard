@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.env
+data/
+.git/
+*.md
+deploy*.sh
+start.bat
+run-docker.sh
