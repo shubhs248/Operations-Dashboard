@@ -59,8 +59,6 @@ A lightweight observability platform built *as a product for the team*:
 
 ## Impact
 
-> Replace the bracketed values with your real numbers — these are the framing.
-
 - Consolidated **6 MCP microservices across 6 namespaces** into one dashboard, replacing manual `oc`/log/JQL digging.
 - Cut **time-to-detect an unhealthy pod** from "when a user complains" to **≈1 polling cycle (5 min)** via automated health scoring + email alerts.
 - Preserved **usage history beyond the cluster's 1–3 day log retention** through scheduled DB snapshots.
